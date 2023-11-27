@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 
-const Journal = () => {
+const YourProps = () => {
   const location = useLocation();
   const [prevLocation, setPrevLocation] = useState("");
   useEffect(() => {
@@ -15,4 +15,4 @@ const Journal = () => {
   );
 };
 
-export default Journal;
+export default YourProps;

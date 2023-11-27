@@ -1,32 +1,27 @@
 import React, { useState } from "react";
 import { BsCheckCircleFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
-import { logoLight } from "../../assets/images";
 
 const SignUp = () => {
   // ============= Initial State Start here =============
-  const [clientName, setClientName] = useState("");
+  const [username, setClientName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [country, setCountry] = useState("");
-  const [zip, setZip] = useState("");
   const [checked, setChecked] = useState(false);
   // ============= Initial State End here ===============
   // ============= Error Msg Start here =================
   const [errClientName, setErrClientName] = useState("");
   const [errEmail, setErrEmail] = useState("");
-  const [errPhone, setErrPhone] = useState("");
   const [errPassword, setErrPassword] = useState("");
-  const [errAddress, setErrAddress] = useState("");
-  const [errCity, setErrCity] = useState("");
-  const [errCountry, setErrCountry] = useState("");
-  const [errZip, setErrZip] = useState("");
   // ============= Error Msg End here ===================
   const [successMsg, setSuccessMsg] = useState("");
   // ============= Event Handler Start here =============
+
+  
+  // New state for OTP
+  const [otp, setOtp] = useState("");
+  const [errOtp, setErrOtp] = useState("");
+
   const handleName = (e) => {
     setClientName(e.target.value);
     setErrClientName("");
@@ -35,29 +30,9 @@ const SignUp = () => {
     setEmail(e.target.value);
     setErrEmail("");
   };
-  const handlePhone = (e) => {
-    setPhone(e.target.value);
-    setErrPhone("");
-  };
   const handlePassword = (e) => {
     setPassword(e.target.value);
     setErrPassword("");
-  };
-  const handleAddress = (e) => {
-    setAddress(e.target.value);
-    setErrAddress("");
-  };
-  const handleCity = (e) => {
-    setCity(e.target.value);
-    setErrCity("");
-  };
-  const handleCountry = (e) => {
-    setCountry(e.target.value);
-    setErrCountry("");
-  };
-  const handleZip = (e) => {
-    setZip(e.target.value);
-    setErrZip("");
   };
   // ============= Event Handler End here ===============
   // ================= Email Validation start here =============
@@ -68,11 +43,12 @@ const SignUp = () => {
   };
   // ================= Email Validation End here ===============
 
+  
   const handleSignUp = (e) => {
     e.preventDefault();
     if (checked) {
-      if (!clientName) {
-        setErrClientName("Enter your name");
+      if (!username) {
+        setErrClientName("Enter your username");
       }
       if (!email) {
         setErrEmail("Enter your email");
@@ -81,9 +57,6 @@ const SignUp = () => {
           setErrEmail("Enter a Valid email");
         }
       }
-      if (!phone) {
-        setErrPhone("Enter your phone number");
-      }
       if (!password) {
         setErrPassword("Create a password");
       } else {
@@ -91,44 +64,84 @@ const SignUp = () => {
           setErrPassword("Passwords must be at least 6 characters");
         }
       }
-      if (!address) {
-        setErrAddress("Enter your address");
-      }
-      if (!city) {
-        setErrCity("Enter your city name");
-      }
-      if (!country) {
-        setErrCountry("Enter the country you are residing");
-      }
-      if (!zip) {
-        setErrZip("Enter the zip code of your area");
-      }
       // ============== Getting the value ==============
       if (
-        clientName &&
+        username &&
         email &&
         EmailValidation(email) &&
         password &&
-        password.length >= 6 &&
-        address &&
-        city &&
-        country &&
-        zip
+        password.length >= 6 
       ) {
         setSuccessMsg(
-          `Hello dear ${clientName}, Welcome you to PropLuxe Admin panel. We received your Sign up request. We are processing to validate your access. Till then stay connected and additional assistance will be sent to you by your mail at ${email}`
+          `Hello dear ${username}, Welcome you to PropLuxe Admin panel. We received your Sign up request. We are sending an OTP at ${email} enter your OTP in the
+          box below`
         );
         setClientName("");
         setEmail("");
-        setPhone("");
         setPassword("");
-        setAddress("");
-        setCity("");
-        setCountry("");
-        setZip("");
       }
     }
+
+    
   };
+
+  const handleVerifyOTP = async () => {
+    // Make an API request to verify the entered OTP
+    try {
+      const response = await fetch("your-api-endpoint/verify-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email, // Include the user's email for verification
+          otp,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccessMsg(
+          `Hello dear ${username}, Welcome you to PropLuxe Admin panel. Your account has been successfully created!`
+        );
+      } else {
+        setErrOtp(data.message || "Error verifying OTP. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      setErrOtp("An error occurred. Please try again later.");
+    }
+  };
+
+  const handleResendOTP = async () => {
+    // Make an API request to resend OTP
+    try {
+      const response = await fetch("your-api-endpoint/resend-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email, // Include the user's email for OTP resend
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        // Handle success (optional)
+      } else {
+        console.error("Error resending OTP:", data.message || "Unknown error");
+        // Handle error (optional)
+      }
+    } catch (error) {
+      console.error("Error resending OTP:", error);
+      // Handle error (optional)
+    }
+  };
+
+
   return (
     <div className="w-full h-screen flex items-center justify-start">
       <div className="w-1/2 hidden lgl:inline-flex h-full text-white">
@@ -198,17 +211,36 @@ const SignUp = () => {
       <div className="w-full lgl:w-[500px] h-full flex flex-col justify-center">
         {successMsg ? (
           <div className="w-[500px]">
-            <p className="w-full px-4 py-10 text-green-500 font-medium font-titleFont">
-              {successMsg}
-            </p>
-            <Link to="/signin">
-              <button
-                className="w-full h-10 bg-primeColor rounded-md text-gray-200 text-base font-titleFont font-semibold 
-            tracking-wide hover:bg-black hover:text-white duration-300"
-              >
-                Sign in
-              </button>
-            </Link>
+            <p className="w-full px-4 py-2 text-green-500 font-medium font-titleFont">
+                  {successMsg}:
+                </p>
+                <input
+                  onChange={(e) => setOtp(e.target.value)}
+                  value={otp}
+                  className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
+                  type="text"
+                  placeholder="Enter OTP"
+                />
+                {errOtp && (
+                  <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
+                    <span className="font-bold italic mr-1">!</span>
+                    {errOtp}
+                  </p>
+                )}
+                <button
+                  onClick={handleVerifyOTP}
+                  className="w-full h-10 bg-primeColor rounded-md text-gray-200 text-base font-titleFont font-semibold 
+        tracking-wide hover:bg-black hover:text-white duration-300 mb-2"
+                >
+                  Verify OTP
+                </button>
+                <button
+        onClick={handleResendOTP}
+        className="w-full h-10 bg-primeColor rounded-md text-gray-200 text-base font-titleFont font-semibold 
+        tracking-wide hover:bg-black hover:text-white duration-300"
+      >
+        Resend OTP
+      </button>
           </div>
         ) : (
           <form className="w-full lgl:w-[500px] h-screen flex items-center justify-center">
@@ -220,14 +252,14 @@ const SignUp = () => {
                 {/* client name */}
                 <div className="flex flex-col gap-.5">
                   <p className="font-titleFont text-base font-semibold text-gray-600">
-                    Full Name
+                    Enter username
                   </p>
                   <input
                     onChange={handleName}
-                    value={clientName}
+                    value={username}
                     className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
                     type="text"
-                    placeholder="eg. John Doe"
+                    placeholder="myusername123"
                   />
                   {errClientName && (
                     <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
@@ -255,25 +287,7 @@ const SignUp = () => {
                     </p>
                   )}
                 </div>
-                {/* Phone Number */}
-                <div className="flex flex-col gap-.5">
-                  <p className="font-titleFont text-base font-semibold text-gray-600">
-                    Phone Number
-                  </p>
-                  <input
-                    onChange={handlePhone}
-                    value={phone}
-                    className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
-                    type="text"
-                    placeholder="008801234567891"
-                  />
-                  {errPhone && (
-                    <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
-                      <span className="font-bold italic mr-1">!</span>
-                      {errPhone}
-                    </p>
-                  )}
-                </div>
+                
                 {/* Password */}
                 <div className="flex flex-col gap-.5">
                   <p className="font-titleFont text-base font-semibold text-gray-600">
@@ -293,82 +307,7 @@ const SignUp = () => {
                     </p>
                   )}
                 </div>
-                {/* Address */}
-                <div className="flex flex-col gap-.5">
-                  <p className="font-titleFont text-base font-semibold text-gray-600">
-                    Address
-                  </p>
-                  <input
-                    onChange={handleAddress}
-                    value={address}
-                    className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
-                    type="text"
-                    placeholder="road-001, house-115, example area"
-                  />
-                  {errAddress && (
-                    <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
-                      <span className="font-bold italic mr-1">!</span>
-                      {errAddress}
-                    </p>
-                  )}
-                </div>
-                {/* City */}
-                <div className="flex flex-col gap-.5">
-                  <p className="font-titleFont text-base font-semibold text-gray-600">
-                    City
-                  </p>
-                  <input
-                    onChange={handleCity}
-                    value={city}
-                    className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
-                    type="text"
-                    placeholder="Your city"
-                  />
-                  {errCity && (
-                    <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
-                      <span className="font-bold italic mr-1">!</span>
-                      {errCity}
-                    </p>
-                  )}
-                </div>
-                {/* Country */}
-                <div className="flex flex-col gap-.5">
-                  <p className="font-titleFont text-base font-semibold text-gray-600">
-                    Country
-                  </p>
-                  <input
-                    onChange={handleCountry}
-                    value={country}
-                    className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
-                    type="text"
-                    placeholder="Your country"
-                  />
-                  {errCountry && (
-                    <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
-                      <span className="font-bold italic mr-1">!</span>
-                      {errCountry}
-                    </p>
-                  )}
-                </div>
-                {/* Zip code */}
-                <div className="flex flex-col gap-.5">
-                  <p className="font-titleFont text-base font-semibold text-gray-600">
-                    Zip/Postal code
-                  </p>
-                  <input
-                    onChange={handleZip}
-                    value={zip}
-                    className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
-                    type="text"
-                    placeholder="Your country"
-                  />
-                  {errZip && (
-                    <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
-                      <span className="font-bold italic mr-1">!</span>
-                      {errZip}
-                    </p>
-                  )}
-                </div>
+                
                 {/* Checkbox */}
                 <div className="flex items-start mdl:items-center gap-2">
                   <input
