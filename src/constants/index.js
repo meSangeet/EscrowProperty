@@ -37,8 +37,8 @@ export const navBarList = [
   },
   {
     _id: 1005,
-    title: "MyProps",
-    link: "/MyProps",
+    title: "Journal",
+    link: "/journal",
   },
 ];
 // =================== NavBarList End here ======================
@@ -248,44 +248,54 @@ status -
 */
 export const myProps = [
   {
-    _id: 1014,
-    img: newArrTwo,
-    productName: "House 13",
-    price: "250.00",
-    color: "Place 13",
-    verificationfee: "",
-    adminauth: "",
-    goverment: "",
-    
-    badge: true,
-    des: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic excepturi quibusdam odio deleniti reprehenderit facilis.",
-  },
-  {
-    _id: 1015,
-    img: newArrFour,
-    productName: "House 14",
-    price: "60.00",
-    color: "Place 14",
-    badge: false,
-    des: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic excepturi quibusdam odio deleniti reprehenderit facilis.",
-  },
-  {
-    _id: 1016,
-    img: newArrTwo,
-    productName: "House 15",
-    price: "250.00",
-    color: "Place 15",
-    badge: true,
-    des: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic excepturi quibusdam odio deleniti reprehenderit facilis.",
-  },
-  {
-    _id: 1017,
     img: bestSellerFour,
     productName: "House 16",
     price: "220.00",
     color: "Place 16",
-    badge: false,
-    des: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic excepturi quibusdam odio deleniti reprehenderit facilis.",
+    verificationfee: "false",
+    adminApproved: "false",
+    governmentAproved: "false",
+    minted: "false"
+  },
+  {
+    img: bestSellerFour,
+    productName: "House 16",
+    price: "220.00",
+    color: "Place 16",
+    verificationfee: "true",
+    adminApproved: "false",
+    governmentAproved: "false",
+    minted: "false"
+  },
+  {
+    img: bestSellerFour,
+    productName: "House 16",
+    price: "220.00",
+    color: "Place 16",
+    verificationfee: "true",
+    adminApproved: "true",
+    governmentAproved: "false",
+    minted: "false"
+  },
+  {
+    img: bestSellerFour,
+    productName: "House 16",
+    price: "220.00",
+    color: "Place 16",
+    verificationfee: "true",
+    adminApproved: "true",
+    governmentAproved: "true",
+    minted: "false"
+  },
+  {
+    img: bestSellerFour,
+    productName: "House 16",
+    price: "220.00",
+    color: "Place 16",
+    verificationfee: "true",
+    adminApproved: "true",
+    governmentAproved: "true",
+    minted: "false"
   }
 ]
 // =================== PaginationItems End here =================

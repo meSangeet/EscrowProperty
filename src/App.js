@@ -45,7 +45,7 @@ const router = createBrowserRouter(
         <Route path="/buy" element={<Buy />}></Route>
         <Route path="/about" element={<About />}></Route>
         <Route path="/contact" element={<Contact />}></Route>
-        <Route path="/MyProps" element={<YourProps />}></Route>
+        <Route path="/myProps" element={<YourProps />}></Route>
         {/* ==================== Header Navlink End here ===================== */}
         <Route path="/offer" element={<Offer />}></Route>
         <Route path="/product/:_id" element={<ProductDetails />}></Route>
