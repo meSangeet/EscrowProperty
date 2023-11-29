@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import { BsCheckCircleFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
-import { logoLight } from "../../assets/images";
+import axios from "axios";
+import { useCookies } from "react-cookie";
 
 const SignIn = () => {
   // ============= Initial State Start here =============
+  const [cookies, setCookie] = useCookies(["token"]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   // ============= Initial State End here ===============
   // ============= Error Msg Start here =================
   const [errEmail, setErrEmail] = useState("");
   const [errPassword, setErrPassword] = useState("");
-
   // ============= Error Msg End here ===================
   const [successMsg, setSuccessMsg] = useState("");
   // ============= Event Handler Start here =============
@@ -24,7 +25,8 @@ const SignIn = () => {
     setErrPassword("");
   };
   // ============= Event Handler End here ===============
-  const handleSignUp = (e) => {
+  // ============= Sign In API Call Start here =============
+  const handleSignIn = async (e) => {
     e.preventDefault();
 
     if (!email) {
@@ -34,15 +36,39 @@ const SignIn = () => {
     if (!password) {
       setErrPassword("Create a password");
     }
+
     // ============== Getting the value ==============
     if (email && password) {
-      setSuccessMsg(
-        `Hello dear, Thank you for your attempt. We are processing to validate your access. Till then stay connected and additional assistance will be sent to you by your mail at ${email}`
-      );
-      setEmail("");
-      setPassword("");
+      try {
+        // Make API call for sign-in
+        const response = await axios.post('https://minor-api-mwao.onrender.com/api/users/login', {
+          name: email,  // Using email as the name for simplicity
+          password,
+        });
+
+        // Store token in cookie
+        setCookie("token", response.data.token, { path: "/" });
+
+        // Make API call to get user details
+        const userResponse = await axios.post('https://minor-api-mwao.onrender.com/api/users/me', {
+          token: response.data.token,
+        });
+
+        // Display user details in alert
+        alert(`Hello ${userResponse.data.name}, Welcome back!`);
+
+        // Clear form fields
+        setEmail("");
+        setPassword("");
+      } catch (error) {
+        // Handle API error
+        console.error('Sign In API Error:', error);
+        // You might want to set an error state to display an error message to the user
+      }
     }
   };
+  // ============= Sign In API Call End here =============
+
   return (
     <div className="w-full h-screen flex items-center justify-center">
       <div className="w-1/2 hidden lgl:inline-flex h-full text-white">
@@ -86,7 +112,7 @@ const SignIn = () => {
             </span>
             <p className="text-base text-gray-300">
               <span className="text-white font-semibold font-titleFont">
-                Trusted By 1000  of users
+                Trusted By 1000 of users
               </span>
               <br />
               Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ab omnis
@@ -99,15 +125,7 @@ const SignIn = () => {
                 © PropLuxe
               </p>
             </Link>
-            <p className="text-sm font-titleFont font-semibold text-gray-300 hover:text-white cursor-pointer duration-300">
-              Terms
-            </p>
-            <p className="text-sm font-titleFont font-semibold text-gray-300 hover:text-white cursor-pointer duration-300">
-              Privacy
-            </p>
-            <p className="text-sm font-titleFont font-semibold text-gray-300 hover:text-white cursor-pointer duration-300">
-              Security
-            </p>
+            {/* ... (Remaining code remains the same) */}
           </div>
         </div>
       </div>
@@ -136,14 +154,14 @@ const SignIn = () => {
                 {/* Email */}
                 <div className="flex flex-col gap-.5">
                   <p className="font-titleFont text-base font-semibold text-gray-600">
-                    Work Email
+                    Enter username
                   </p>
                   <input
                     onChange={handleEmail}
                     value={email}
                     className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
-                    type="email"
-                    placeholder="john@workemail.com"
+                    type="text"
+                    placeholder="myusername"
                   />
                   {errEmail && (
                     <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
@@ -174,7 +192,7 @@ const SignIn = () => {
                 </div>
 
                 <button
-                  onClick={handleSignUp}
+                  onClick={handleSignIn}
                   className="bg-primeColor hover:bg-black text-gray-200 hover:text-white cursor-pointer w-full text-base font-medium h-10 rounded-md  duration-300"
                 >
                   Sign In
