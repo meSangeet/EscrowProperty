@@ -5,21 +5,21 @@ import { useNavigate } from "react-router-dom";
 
 const MyProfile = () => {
   const [cookies] = useCookies(["token"]);
-  const [userDetails, setUserDetails] = useState(cookies.userData);
+  const [userDetails, setUserDetails] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
+        
         if (cookies.token) {
-            console.log(cookies);
-          const response = await axios.get(
-            "https://minor-api-mwao.onrender.com/api/users/me",
+          const response = await axios.post(
+            "http://localhost:3000/api/users/me",
             {
               token:cookies.token,
             },
           );
-          alert(cookies.token);
+
           setUserDetails(response.data);
         } else {
           // Handle the absence of token, e.g., redirect to login page
@@ -59,13 +59,6 @@ const MyProfile = () => {
                 Role:   
               </p>
               <p className="text-base font-medium">   {userDetails.role}</p>
-            </div>
-
-            <div className="flex justify-between">
-              <p className="font-titleFont text-base font-semibold text-gray-600">
-                Wallet:   
-              </p>
-              <p className="text-base font-medium">   {userDetails.wallet}</p>
             </div>
 
             {/* Add more attributes as needed */}

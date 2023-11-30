@@ -3,6 +3,7 @@ import { BsCheckCircleFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   // ============= Initial State Start here =============
@@ -48,18 +49,8 @@ const SignUp = () => {
   const [otpSent, setOtpSent] = useState(false);
 
   const handleResendOtp = async () => {
-    try {
-      // Make API call to resend OTP
-      await axios.post('https://minor-api-mwao.onrender.com/api/users/resend-otp', {
-        email,
-      });
-      // Set a flag to indicate that OTP is resent
-      setOtpSent(true);
-    } catch (error) {
-      // Handle API error
-      console.error('Resend OTP API Error:', error);
-      // You might want to set an error state to display an error message to the user
-    }
+    setOtpSent("");
+    setChecked(false);
   };
   
   const handleOtpChange = (e) => {
@@ -67,23 +58,13 @@ const SignUp = () => {
     setErrOtp("");
   };
 
-  // ... (previous state and functions)
-
-  const [wallet, setWallet] = useState(""); // New state for wallet field
-  const [errWallet, setErrWallet] = useState(""); // New state for wallet error
-
-  const handleWallet = (e) => {
-    setWallet(e.target.value);
-    setErrWallet("");
-  };
-
+  const navigate = useNavigate();
   const handleOtpVerification = async () => {
     try {
       // Make API call for OTP verification
-      const response = await axios.post('https://minor-api-mwao.onrender.com/api/users/verify', {
+      const response = await axios.post('http://localhost:3000/api/users/verify', {
         otp,
       });
-
             // Store token in cookie
             setCookie("token", response.data.token, { path: "/" });
       // Handle success response
@@ -95,6 +76,8 @@ const SignUp = () => {
       setPassword("");
       setOtp("");
       setChecked(false);
+
+      navigate("/");
 
     } catch (error) {
       // Handle API error
@@ -126,10 +109,6 @@ const SignUp = () => {
         }
       }
 
-      // Validate wallet field
-      if (!wallet) {
-        setErrWallet("Enter your wallet ID");
-      }
 
       // ============== Getting the value ==============
       if (
@@ -137,27 +116,24 @@ const SignUp = () => {
         email &&
         EmailValidation(email) &&
         password &&
-        password.length >= 6 &&
-        wallet
+        password.length >= 6 
       ) {
 
         try {
           // Make API call for signup
-          const response = await axios.post('https://minor-api-mwao.onrender.com/api/users/signup', {
+          const response = await axios.post('http://localhost:3000/api/users/signup', {
             name: clientName,
             email,
             password,
-            wallet,
             // Remove the following fields from the request: phone, address, city, country, zip
           });
 // Set a flag to indicate that OTP is sent
 setSuccessMsg(
-  `Hello dear ${clientName}, Welcome you to PropLuxe Admin panel. We received your Sign up request. We are processing to validate your access. Till then stay connected and additional assistance will be sent to you by your mail at ${email}`
+  `Hello dear ${clientName}, Your account with the email - ${email} has been successfully created`
 );
 setClientName("");
 setEmail("");
 setPassword("");
-setWallet("");
 setOtpSent(true);
       } catch (error) {
         // Handle API error
@@ -284,14 +260,14 @@ setOtpSent(true);
                 {/* client name */}
                 <div className="flex flex-col gap-.5">
                   <p className="font-titleFont text-base font-semibold text-gray-600">
-                    Full Name
+                    enter username
                   </p>
                   <input
                     onChange={handleName}
                     value={clientName}
                     className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
                     type="text"
-                    placeholder="eg. John Doe"
+                    placeholder="username"
                   />
                   {errClientName && (
                     <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
@@ -341,25 +317,6 @@ setOtpSent(true);
                   )}
                 </div>
                 
-                {/* Wallet Field */}
-              <div className="flex flex-col gap-.5">
-                <p className="font-titleFont text-base font-semibold text-gray-600">
-                  Wallet ID
-                </p>
-                <input
-                  onChange={handleWallet}
-                  value={wallet}
-                  className="w-full h-8 placeholder:text-sm placeholder:tracking-wide px-4 text-base font-medium placeholder:font-normal rounded-md border-[1px] border-gray-400 outline-none"
-                  type="text"
-                  placeholder="Enter your wallet ID"
-                />
-                {errWallet && (
-                  <p className="text-sm text-red-500 font-titleFont font-semibold px-4">
-                    <span className="font-bold italic mr-1">!</span>
-                    {errWallet}
-                  </p>
-                )}
-              </div>
 
 
                 {/* Checkbox */}

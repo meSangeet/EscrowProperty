@@ -42,23 +42,20 @@ const SignIn = () => {
     if (email && password) {
       try {
         // Make API call for sign-in
-        const response = await axios.post('https://minor-api-mwao.onrender.com/api/users/login', {
+        const response = await axios.post('http://localhost:3000/api/users/login', {
           name: email,  // Using email as the name for simplicity
           password,
         });
-
         // Store token in cookie
         setCookie("token", response.data.token, { path: "/" });
-        console.log(response)
         // Make API call to get user details
-        const userResponse = await axios.post('https://minor-api-mwao.onrender.com/api/users/me', {
+        const userResponse = await axios.post('http://localhost:3000/api/users/me', {
           token: cookies.token,
         });
 
-        setCookie("userData", userResponse.data, {path: "/"});
 
         // Display user details in alert
-        alert(`Hello ${cookies.userData.name}, Welcome back!`);
+        alert(`Hello ${userResponse.data.name}, Welcome back!`);
 
         // Clear form fields
         setEmail("");

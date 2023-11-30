@@ -125,10 +125,11 @@ const HeaderBottom = () => {
                   Profile
                 </li>
                 </Link>
-                
+                <Link onClick={() => setShowUser(false)} to="/addProps"> 
                 <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400  hover:border-b-white hover:text-white duration-300 cursor-pointer">
-                  Become A Seller
+                  Add Property
                 </li>
+                </Link>
               </motion.ul>
             )}
             <Link to="/cart">

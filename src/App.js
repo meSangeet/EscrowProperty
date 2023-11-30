@@ -16,7 +16,7 @@ import About from "./pages/About/About";
 import SignIn from "./pages/Account/SignIn";
 import SignUp from "./pages/Account/SignUp";
 import Cart from "./pages/Cart/Cart";
-import Contact from "./pages/Contact/Contact";
+import List from "./pages/List/List";
 import Home from "./pages/Home/Home";
 import YourProps from "./pages/YourProps/YourProps";
 import Offer from "./pages/Offer/Offer";
@@ -50,7 +50,8 @@ const router = createBrowserRouter(
         <Route path="/buy" element={<Buy />} />
         <Route path="/MyProfile" element={<MyProfile />} /> {/* Use an absolute path */}
         <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
+        <Route path="/addProps" element={<addProps />} />
+        <Route path="/list" element={<List />} />
         <Route path="/myProps" element={<YourProps />} />
         {/* ==================== Header Navlink End here ===================== */}
         <Route path="/offer" element={<Offer />} />
@@ -72,3 +73,4 @@ function App() {
 }
 
 export default App;
+//const [errMessages, setErrMessages] = useState('');
