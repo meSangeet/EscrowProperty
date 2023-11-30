@@ -3,6 +3,7 @@ import { BsCheckCircleFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 
 const SignIn = () => {
   // ============= Initial State Start here =============
@@ -26,6 +27,7 @@ const SignIn = () => {
   };
   // ============= Event Handler End here ===============
   // ============= Sign In API Call Start here =============
+   const navigate = useNavigate();
   const handleSignIn = async (e) => {
     e.preventDefault();
 
@@ -36,7 +38,6 @@ const SignIn = () => {
     if (!password) {
       setErrPassword("Create a password");
     }
-
     // ============== Getting the value ==============
     if (email && password) {
       try {
@@ -48,18 +49,22 @@ const SignIn = () => {
 
         // Store token in cookie
         setCookie("token", response.data.token, { path: "/" });
-
+        console.log(response)
         // Make API call to get user details
         const userResponse = await axios.post('https://minor-api-mwao.onrender.com/api/users/me', {
-          token: response.data.token,
+          token: cookies.token,
         });
 
+        setCookie("userData", userResponse.data, {path: "/"});
+
         // Display user details in alert
-        alert(`Hello ${userResponse.data.name}, Welcome back!`);
+        alert(`Hello ${cookies.userData.name}, Welcome back!`);
 
         // Clear form fields
         setEmail("");
         setPassword("");
+        
+        navigate("/MyProfile");
       } catch (error) {
         // Handle API error
         console.error('Sign In API Error:', error);

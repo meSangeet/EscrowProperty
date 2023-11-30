@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FaHome, FaSearch, FaUser, FaCaretDown, FaShoppingCart } from "react-icons/fa";
+import { FaHome, FaSearch, FaUser, FaCaretDown } from "react-icons/fa";
 import Flex from "../../designLayouts/Flex";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -24,7 +24,6 @@ const HeaderBottom = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [showSearchBar, setShowSearchBar] = useState(false);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
@@ -76,7 +75,6 @@ const HeaderBottom = () => {
                             },
                           }
                         ) &
-                        setShowSearchBar(true) &
                         setSearchQuery("")
                       }
                       key={item._id}
@@ -122,9 +120,12 @@ const HeaderBottom = () => {
                     Sign Up
                   </li>
                 </Link>
+                <Link  onClick={() => setShowUser(false)} to="/MyProfile">
                 <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400 hover:border-b-white hover:text-white duration-300 cursor-pointer">
                   Profile
                 </li>
+                </Link>
+                
                 <li className="text-gray-400 px-4 py-1 border-b-[1px] border-b-gray-400  hover:border-b-white hover:text-white duration-300 cursor-pointer">
                   Become A Seller
                 </li>
