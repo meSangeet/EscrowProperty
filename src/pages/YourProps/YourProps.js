@@ -3,13 +3,87 @@ import { useLocation } from "react-router-dom";
 import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import axios from "axios";
 import { useCookies } from "react-cookie";
+import { ethers } from "ethers";
+
+//abi import
+const  propabi=[
+  {
+    inputs: [],
+    stateMutability: "nonpayable",
+    type: "constructor",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "string",
+        name: "propertyId",
+        type: "string",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "payer",
+        type: "address",
+      },
+    ],
+    name: "VerificationFeePaid",
+    type: "event",
+  },
+  {
+    inputs: [],
+    name: "admin",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "deposit",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "minimumPayment",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "propertyId",
+        type: "string",
+      },
+    ],
+    name: "payVerificationFee",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+]
 
 const MyProps = () => {
   const location = useLocation();
   const [prevLocation, setPrevLocation] = useState("");
   const [properties, setProperties] = useState([]);
   const [currentProperty, setCurrentProperty] = useState(null);
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [cookies, setCookie] = useCookies(["token"]);
 
   useEffect(() => {
@@ -30,20 +104,56 @@ const MyProps = () => {
 
   const handlePropertyClick = (property) => {
     setCurrentProperty(property);
-    setCurrentPhotoIndex(0);
   };
 
-  const handleNextPhoto = () => {
-    setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % currentProperty.photos.length);
-  };
+  const handlePayVerificationFee = async () => {
+    try {
+      // Check if MetaMask is installed and available
+      const propverify = "0x1b67dc3EAB89A7EE6aeeb73CF229B1109CdABA6b";
+      if (window.ethereum) {
+        // Create ethers provider and signer
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        
+        const signer = provider.getSigner();
 
+        const contract=new ethers.Contract(propverify,propabi,signer);
+        console.log(contract);
+
+        // Perform operations using the address retrieved
+        // ...
+        const amount=ethers.utils.parseEther("0.001");
+        const fn="payVerificationFee"
+        const trans=await contract.functions[fn](currentProperty._id,{ value: amount })
+        console.log(trans);if (trans && trans.hash) {
+          // Transaction successful
+          alert("Transaction successful!");
+          // Refresh the page after 1 second
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          // Transaction failed
+          alert("Transaction failed!");
+        }
+      } else {
+        console.error("MetaMask not detected");
+        // Handle the case when MetaMask is not available
+      }
+    } catch (error) {
+      console.error("Error fetching account address:", error);
+      // Handle the error gracefully - display a message to the user or perform necessary actions.
+    }
+  };
+  
+  
   return (
     <div className="max-w-container mx-auto px-4">
       <Breadcrumbs title="Your Properties" prevLocation={prevLocation} />
-
+      <button class="enableEthereumButton btn">connect Ethereum</button>
+<button class="sendEthButton btn">Send ETH</button>
       <div className="mt-8">
         {properties.map((property) => (
-          <div key={property._id} className="border p-4 mb-4 rounded-md">
+          <div key={property._id} className="border p-4 mb-4 rounded-md" onClick={()=>handlePropertyClick(property)}>
             <h2 className="text-lg font-semibold mb-2">{property.name}</h2>
 
             {/* Property Photos */}
@@ -61,7 +171,9 @@ const MyProps = () => {
             {/* Status Field */}
             <div className="mt-4">
               {property.paidVerification === false && (
-                <button className="bg-blue-500 text-white px-2 py-1 rounded-md mr-2">
+                <button 
+                onClick={handlePayVerificationFee}
+                className="bg-blue-500 text-white px-2 py-1 rounded-md mr-2">
                   Pay Verification Fee
                 </button>
               )}
