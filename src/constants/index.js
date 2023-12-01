@@ -39,7 +39,7 @@ export const navBarList = [
     _id: 1005,
     title: "MyProps",
     link: "/myProps",
-  },
+  }
 ];
 // =================== NavBarList End here ======================
 // =================== Special Offer data Start here ============

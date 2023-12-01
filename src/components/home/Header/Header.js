@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSDK } from '@metamask/sdk-react';
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { MdClose } from "react-icons/md";
 import { HiMenuAlt2 } from "react-icons/hi";
@@ -6,10 +7,24 @@ import { motion } from "framer-motion";
 import { navBarList } from "../../../constants";
 import Flex from "../../designLayouts/Flex";
 import './Header.css'
+
 const Header = () => {
+  const [account, setAccount] = useState();
+  const { sdk, connected, connecting } = useSDK();
+
+  const connect = async () => {
+    try {
+      const accounts = await sdk?.connect();
+      setAccount(accounts);
+    } catch(err) {
+      console.warn(`failed to connect..`, err);
+    }
+  };
+
   const [showMenu, setShowMenu] = useState(true);
   const [sidenav, setSidenav] = useState(false);
   const location = useLocation();
+
   useEffect(() => {
     let ResponsiveMenu = () => {
       if (window.innerWidth < 667) {
@@ -24,11 +39,21 @@ const Header = () => {
 
   return (
     <div className="w-full h-20 sticky top-0 z-50 border-b-[1px] border-b-gray-200 headercolor bg-opacity-25">
+      <button style={{ padding: 10, margin: 10 }} onClick={connect}>
+        Connect
+      </button>
+      {connected && (
+        <div>
+          <>
+            {account && `Connected account: ${account}`}
+          </>
+        </div>
+      )}
       <nav className="h-full px-4 max-w-container mx-auto relative">
         <Flex className="flex items-center justify-between h-full">
           <Link to="/">
             <div className="WrittenLogo">
-            <span className="lefft " styles="font-color: blue">Prop</span><span className="rigght">Luxe</span>
+              <span className="lefft">Prop</span><span className="rigght">Luxe</span>
             </div>
           </Link>
           <div>
@@ -39,18 +64,16 @@ const Header = () => {
                 transition={{ duration: 0.5 }}
                 className="flex items-center w-auto z-50 p-0 gap-2"
               >
-                <>
-                  {navBarList.map(({ _id, title, link }) => (
-                    <NavLink
-                      key={_id}
-                      className="flex font-normal hover:font-bold w-20 h-6 justify-center items-center px-12 text-base text-[#000000] hover:underline underline-offset-[4px] decoration-[1px] hover:text-[#1622fb] md:border-r-[2px] border-r-gray-300 hoverEffect last:border-r-0"
-                      to={link}
-                      state={{ data: location.pathname.split("/")[1] }}
-                    >
-                      <li>{title}</li>
-                    </NavLink>
-                  ))}
-                </>
+                {navBarList.map(({ _id, title, link }) => (
+                  <NavLink
+                    key={_id}
+                    className="flex font-normal hover:font-bold w-20 h-6 justify-center items-center px-12 text-base text-[#000000] hover:underline underline-offset-[4px] decoration-[1px] hover:text-[#1622fb] md:border-r-[2px] border-r-gray-300 hoverEffect last:border-r-0"
+                    to={link}
+                    state={{ data: location.pathname.split("/")[1] }}
+                  >
+                    <li>{title}</li>
+                  </NavLink>
+                ))}
               </motion.ul>
             )}
             <HiMenuAlt2
@@ -66,9 +89,9 @@ const Header = () => {
                   className="w-[80%] h-full relative"
                 >
                   <div className="w-full h-full bg-primeColor p-6">
-                  <div className="WrittenLogo">
-            <span className="lefft" styles="font-color: blue">Prop</span><span className="rigght">Luxe</span>
-            </div>
+                    <div className="WrittenLogo">
+                      <span className="lefft">Prop</span><span className="rigght">Luxe</span>
+                    </div>
                     <ul className="text-gray-200 flex flex-col gap-2">
                       {navBarList.map((item) => (
                         <li

@@ -4,6 +4,7 @@ import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import { ethers } from "ethers";
+import { upload } from "@testing-library/user-event/dist/upload";
 
 //abi import
 const  propabi=[
@@ -85,7 +86,6 @@ const MyProps = () => {
   const [properties, setProperties] = useState([]);
   const [currentProperty, setCurrentProperty] = useState(null);
   const [cookies, setCookie] = useCookies(["token"]);
-
   useEffect(() => {
     setPrevLocation(location.state.data);
 
@@ -105,7 +105,6 @@ const MyProps = () => {
   const handlePropertyClick = (property) => {
     setCurrentProperty(property);
   };
-
   const handlePayVerificationFee = async () => {
     try {
       // Check if MetaMask is installed and available
@@ -145,12 +144,36 @@ const MyProps = () => {
     }
   };
   
-  
+  const uploadfn = async () => {
+    try {
+
+        const jsonData = {
+          token: cookies.token, // Replace with your token logic
+          propertyId: currentProperty._id, // Assuming 'currentProperty' is set elsewhere
+          // ... Add other JSON data properties if needed
+        };
+
+        // Merge file and JSON data into a single FormData object
+   
+
+        const uploadResponse = await axios.post("http://localhost:3000/api/properties/upload", jsonData);
+
+        if (uploadResponse.status === 200) {
+          
+          alert("uploaded to ipfs!");
+          window.location.reload();
+          // You may perform additional actions after successful upload if needed
+        } else {
+          alert("Failed to upload image");
+        }
+      
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
+  };
   return (
     <div className="max-w-container mx-auto px-4">
       <Breadcrumbs title="Your Properties" prevLocation={prevLocation} />
-      <button class="enableEthereumButton btn">connect Ethereum</button>
-<button class="sendEthButton btn">Send ETH</button>
       <div className="mt-8">
         {properties.map((property) => (
           <div key={property._id} className="border p-4 mb-4 rounded-md" onClick={()=>handlePropertyClick(property)}>
@@ -170,7 +193,15 @@ const MyProps = () => {
 
             {/* Status Field */}
             <div className="mt-4">
-              {property.paidVerification === false && (
+            {!property.ipfsLink && (
+        <button 
+    onClick={uploadfn}
+    className="bg-blue-500 text-white px-2 py-1 rounded-md mr-2"
+  >
+uploadtoipfs  </button>
+)}
+
+              {property.ipfsLink&&property.paidVerification === false && (
                 <button 
                 onClick={handlePayVerificationFee}
                 className="bg-blue-500 text-white px-2 py-1 rounded-md mr-2">
