@@ -5,7 +5,7 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 import { ethers } from "ethers";
 import { upload } from "@testing-library/user-event/dist/upload";
-
+import Web3 from "web3";
 //abi import
 const  propabi=[
   {
@@ -143,7 +143,440 @@ const MyProps = () => {
       // Handle the error gracefully - display a message to the user or perform necessary actions.
     }
   };
+  async function handleMint (link) {
+      const ipfsUri = link;
+      console.log(link);
+      if (!ipfsUri) {
+        alert("Please enter an IPFS URI");
+        return;
+      }
+
+      // Check if MetaMask is installed
+    if (typeof window.ethereum === 'undefined') {
+      alert('Please install MetaMask to mint NFTs');
+      return;
+    }
+
+    // Request account access
+    try {
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+      // Contract address
+      const contractAddress = '0xe916BeeA0314077e45A59EF386022B27aF585718';
+
+      const contractAbi = [
+        { inputs: [], stateMutability: "nonpayable", type: "constructor" },
+        {
+          inputs: [
+            { internalType: "address", name: "sender", type: "address" },
+            { internalType: "uint256", name: "tokenId", type: "uint256" },
+            { internalType: "address", name: "owner", type: "address" },
+          ],
+          name: "ERC721IncorrectOwner",
+          type: "error",
+        },
+        {
+          inputs: [
+            { internalType: "address", name: "operator", type: "address" },
+            { internalType: "uint256", name: "tokenId", type: "uint256" },
+          ],
+          name: "ERC721InsufficientApproval",
+          type: "error",
+        },
+        {
+          inputs: [
+            { internalType: "address", name: "approver", type: "address" },
+          ],
+          name: "ERC721InvalidApprover",
+          type: "error",
+        },
+        {
+          inputs: [
+            { internalType: "address", name: "operator", type: "address" },
+          ],
+          name: "ERC721InvalidOperator",
+          type: "error",
+        },
+        {
+          inputs: [
+            { internalType: "address", name: "owner", type: "address" },
+          ],
+          name: "ERC721InvalidOwner",
+          type: "error",
+        },
+        {
+          inputs: [
+            { internalType: "address", name: "receiver", type: "address" },
+          ],
+          name: "ERC721InvalidReceiver",
+          type: "error",
+        },
+        {
+          inputs: [
+            { internalType: "address", name: "sender", type: "address" },
+          ],
+          name: "ERC721InvalidSender",
+          type: "error",
+        },
+        {
+          inputs: [
+            { internalType: "uint256", name: "tokenId", type: "uint256" },
+          ],
+          name: "ERC721NonexistentToken",
+          type: "error",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "owner",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "approved",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+          ],
+          name: "Approval",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "owner",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "operator",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "bool",
+              name: "approved",
+              type: "bool",
+            },
+          ],
+          name: "ApprovalForAll",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "_fromTokenId",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "_toTokenId",
+              type: "uint256",
+            },
+          ],
+          name: "BatchMetadataUpdate",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+          ],
+          name: "ContractApproved",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "_tokenId",
+              type: "uint256",
+            },
+          ],
+          name: "MetadataUpdate",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "tokenURI",
+              type: "string",
+            },
+          ],
+          name: "NFTMinted",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "from",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "to",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+          ],
+          name: "Transfer",
+          type: "event",
+        },
+        {
+          inputs: [],
+          name: "a",
+          outputs: [{ internalType: "address", name: "", type: "address" }],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "admin",
+          outputs: [{ internalType: "address", name: "", type: "address" }],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "address", name: "to", type: "address" },
+            { internalType: "uint256", name: "tokenId", type: "uint256" },
+          ],
+          name: "approve",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "uint256", name: "tokenId", type: "uint256" },
+          ],
+          name: "approveContract",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "address", name: "owner", type: "address" },
+          ],
+          name: "balanceOf",
+          outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "uint256", name: "tokenId", type: "uint256" },
+          ],
+          name: "getApproved",
+          outputs: [{ internalType: "address", name: "", type: "address" }],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "uint256", name: "tokenId", type: "uint256" },
+          ],
+          name: "getTokenURIById",
+          outputs: [{ internalType: "string", name: "", type: "string" }],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "address", name: "owner", type: "address" },
+            { internalType: "address", name: "operator", type: "address" },
+          ],
+          name: "isApprovedForAll",
+          outputs: [{ internalType: "bool", name: "", type: "bool" }],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "string", name: "tokenURI", type: "string" },
+          ],
+          name: "mint",
+          outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "name",
+          outputs: [{ internalType: "string", name: "", type: "string" }],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "uint256", name: "tokenId", type: "uint256" },
+          ],
+          name: "ownerOf",
+          outputs: [{ internalType: "address", name: "", type: "address" }],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "address", name: "from", type: "address" },
+            { internalType: "address", name: "to", type: "address" },
+            { internalType: "uint256", name: "tokenId", type: "uint256" },
+          ],
+          name: "safeTransferFrom",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "address", name: "from", type: "address" },
+            { internalType: "address", name: "to", type: "address" },
+            { internalType: "uint256", name: "tokenId", type: "uint256" },
+            { internalType: "bytes", name: "data", type: "bytes" },
+          ],
+          name: "safeTransferFrom",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "address", name: "operator", type: "address" },
+            { internalType: "bool", name: "approved", type: "bool" },
+          ],
+          name: "setApprovalForAll",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "bytes4", name: "interfaceId", type: "bytes4" },
+          ],
+          name: "supportsInterface",
+          outputs: [{ internalType: "bool", name: "", type: "bool" }],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "symbol",
+          outputs: [{ internalType: "string", name: "", type: "string" }],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "uint256", name: "tokenId", type: "uint256" },
+          ],
+          name: "tokenURI",
+          outputs: [{ internalType: "string", name: "", type: "string" }],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "totalSupply",
+          outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            { internalType: "address", name: "from", type: "address" },
+            { internalType: "address", name: "to", type: "address" },
+            { internalType: "uint256", name: "tokenId", type: "uint256" },
+          ],
+          name: "transferFrom",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ];
+
+      const web3 = new Web3(window.ethereum);
+      const contract = new web3.eth.Contract(contractAbi, contractAddress);
+
+      // Call the mint function
+      try {
+        // Get the account and nonce
+        const accounts = await web3.eth.getAccounts();
+        const nonce = await web3.eth.getTransactionCount(accounts[0]);
   
+        // Estimate gas
+        const gasEstimation = await contract.methods.mint(ipfsUri).estimateGas({
+          from: accounts[0],
+        });
+  
+        // Send transaction
+        const result = await contract.methods.mint(ipfsUri).send({
+          from: accounts[0],
+          gas: gasEstimation, // Adjust the gas limit as needed
+          nonce: nonce,
+        });
+  
+        // Check transaction receipt for confirmation
+        const receipt = await web3.eth.getTransactionReceipt(result.transactionHash);
+  
+        if (receipt.status) {
+          console.log('Transaction confirmed:', receipt);
+          alert('NFT Minted successfully!');
+        } else {
+          console.error('Transaction failed:', receipt);
+          alert('NFT Minting failed. Please check the console for details.');
+        }
+      } catch (error) {
+        console.error("Error minting NFT:", error.message);
+        alert(`Error minting NFT: ${error.message}`);
+      }
+    } catch (error) {
+      console.error('Error requesting account access:', error.message);
+      alert('Error requesting account access');
+    }
+  };
   const uploadfn = async () => {
     try {
 
@@ -152,7 +585,7 @@ const MyProps = () => {
           propertyId: currentProperty._id, // Assuming 'currentProperty' is set elsewhere
           // ... Add other JSON data properties if needed
         };
-
+        console.log(jsonData);
         // Merge file and JSON data into a single FormData object
    
 
@@ -164,11 +597,11 @@ const MyProps = () => {
           window.location.reload();
           // You may perform additional actions after successful upload if needed
         } else {
-          alert("Failed to upload image");
+          alert("Failed to upload");
         }
       
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error("Error uploading:", error);
     }
   };
   return (
@@ -176,21 +609,22 @@ const MyProps = () => {
       <Breadcrumbs title="Your Properties" prevLocation={prevLocation} />
       <div className="mt-8">
         {properties.map((property) => (
-          <div key={property._id} className="border p-4 mb-4 rounded-md" onClick={()=>handlePropertyClick(property)}>
+          <div key={property._id} className="border p-4 mb-4 rounded-md" onClick={() => handlePropertyClick(property)}>
             <h2 className="text-lg font-semibold mb-2">{property.name}</h2>
-
-            {/* Property Photos */}
+            
+            {/* Property Photos*/}
             <div className="flex space-x-4 overflow-x-auto">
               {property.photos.map((photo, index) => (
                 <img
                   key={index}
                   src={photo}
                   alt={`${property.name}-photo-${index}`}
-                  className="h-50px w-auto rounded-md"
+                  className="w-auto rounded-md"
+                  style = {{height:"200px"}}
                 />
               ))}
             </div>
-
+               
             {/* Status Field */}
             <div className="mt-4">
             {!property.ipfsLink && (
@@ -202,37 +636,51 @@ uploadtoipfs  </button>
 )}
 
               {property.ipfsLink&&property.paidVerification === false && (
-                <button 
-                onClick={handlePayVerificationFee}
-                className="bg-blue-500 text-white px-2 py-1 rounded-md mr-2">
+                <a
+                href={`http://127.0.0.1:5500/verificationProp.html?propid=${property._id}`}
+                 target="_blank"
+                className="bg-red-500 text-white px-2 py-1 rounded-md mr-2">
                   Pay Verification Fee
-                </button>
+                </a>
               )}
-              {property.govtApproved.isApproved === false && property.paidVerification && (
+              {property.ipfsLink && property.govtApproved.isApproved === false && property.paidVerification && (
                 <p className="text-yellow-500">Pending Government Approval</p>
               )}
-              {property.approved.isApproved === false && property.govtApproved.isApproved && (
+              {property.ipfsLink && property.paidVerification && property.approved.isApproved === false && property.govtApproved.isApproved && (
                 <p className="text-yellow-500">Pending Admin Approval</p>
               )}
-              {property.minted === false && property.approved.isApproved && (
-                <button className="bg-green-500 text-white px-2 py-1 rounded-md mr-2">
-                  Mint NFT
-                </button>
-              )}
-              {property.canbelisted === false && property.minted && (
-                <button className="bg-purple-500 text-white px-2 py-1 rounded-md mr-2">
+              {property.ipfsLink && property.paidVerification && property.minted === false && property.approved.isApproved && property.govtApproved.isApproved && (
+  <a
+    href={`http://127.0.0.1:5500/mint.html?ipfs=${property.ipfsLink}`}
+    target="_blank"
+    className="bg-green-500 text-white px-2 py-1 rounded-md mr-2"
+  >
+    Mint NFT
+  </a>
+)}
+              {property.ipfsLink && property.paidVerification  && property.approved.isApproved && property.govtApproved.isApproved && property.canbelisted === false && property.minted && (
+                <a
+                href={`http://127.0.0.1:5500/approve.html?nftid=${property.nftid}`}
+                 target="_blank"
+                className="bg-purple-500 text-white px-2 py-1 rounded-md mr-2">
                   Approve Escrow
-                </button>
+                </a>
               )}
-              {property.listed === false && property.canbelisted && (
-                <button className="bg-blue-500 text-white px-2 py-1 rounded-md">
+              {property.ipfsLink && property.paidVerification  && property.approved.isApproved && property.govtApproved.isApproved && property.listed === false && property.canbelisted && (
+                <a
+                href={`http://127.0.0.1:5500/list.html?nftid=${property.nftid}`}
+                 target="_blank"
+                className="bg-purple-500 text-white px-2 py-1 rounded-md mr-2">
                   List NFT
-                </button>
+                </a>
               )}
-              {property.listed === true && (
-                <button className="bg-red-500 text-white px-2 py-1 rounded-md">
+              {property.ipfsLink && property.paidVerification  && property.approved.isApproved && property.govtApproved.isApproved && property.listed === true && (
+                <a
+                href={`http://127.0.0.1:5500/withdraw.html?nftid=${property.nftid}`}
+                 target="_blank"
+                className="bg-red-500 text-white px-2 py-1 rounded-md mr-2">
                   Withdraw NFT
-                </button>
+                </a>
               )}
             </div>
 

@@ -1,30 +1,42 @@
-import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import Breadcrumbs from "../../components/pageProps/Breadcrumbs";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useCookies } from "react-cookie";
+import Property from '../../components/home/Products/Property2';
 
-const About = () => {
-  const location = useLocation();
-  const [prevLocation, setPrevLocation] = useState("");
+
+
+const PropertyList = () => {
+  const [cookies, setCookie] = useCookies(["token"]);
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    setPrevLocation(location.state.data);
-  }, [location]);
+    // Replace with actual token retrieval logic
+    const token = cookies.token;
+
+    axios
+      .post("http://localhost:3000/api/properties/getmine", { token })
+      .then((response) => {
+        setProperties(response.data.properties);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching properties:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className="max-w-container mx-auto px-4">
-      <Breadcrumbs title="About" prevLocation={prevLocation} />
-      <div className="pb-10">
-        <h1 className="max-w-[600px] text-base text-lightText mb-2">
-          <span className="text-primeColor font-semibold text-lg">PropLuxe</span>{" "}
-          is the world's leading luxury property marketplace and is internationally
-          recognized for celebrating the essence of classic Worldwide aesthetees.
-        </h1>
-        <Link to="/Buy">
-          <button className="w-52 h-10 bg-primeColor text-white hover:bg-black duration-300">
-            Continue Checking Out
-          </button>
-        </Link>
-      </div>
+    <div>
+      {properties.map((property) => (
+        <Property property={property} />
+      ))}
     </div>
   );
 };
 
-export default About;
+export default PropertyList;

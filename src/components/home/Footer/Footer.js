@@ -1,19 +1,46 @@
 import React, { useState } from "react";
+import { useSDK } from '@metamask/sdk-react';
 import { motion } from "framer-motion";
 import { FaFacebook, FaYoutube, FaLinkedin, FaGithub } from "react-icons/fa";
 import FooterListTitle from "./FooterListTitle";
-
+import { useCookies } from "react-cookie";
 const Footer = () => {
+  const { sdk, connected, connecting } = useSDK();
+  const [account, setAccount] = useState();
+
   const [emailInfo, setEmailInfo] = useState("");
   const [subscription, setSubscription] = useState(false);
   const [errMsg, setErrMsg] = useState("");
-
+  const [cookies, setCookie, removeCookie] = useCookies(['token', 'latt', 'long']); // List all your cookie names
   const emailValidation = () => {
     return String(emailInfo)
       .toLocaleLowerCase()
       .match(/^\w+([-]?\w+)*@\w+([-]?\w+)*(\.\w{2,3})+$/);
   };
+  const connect = async () => {
+    try {
+      const accounts = await sdk?.connect();
+      setAccount(accounts);
+    } catch(err) {
+      console.warn(`failed to connect..`, err);
+    }
+  };
 
+
+  const handleSignout = () => {
+    // Delete all cookies
+    Object.keys(cookies).forEach(cookieName => {
+      removeCookie(cookieName);
+    });
+
+    // Alternatively, you can delete cookies one by one
+    // removeCookie('cookie1');
+    // removeCookie('cookie2');
+    // ...
+
+    console.log('All cookies deleted');
+    window.location.reload();
+  };
   const handleSubscription = () => {
     if (emailInfo === "") {
       setErrMsg("Please provide an Email !");
@@ -152,9 +179,26 @@ const Footer = () => {
                 >
                   Subscribe
                 </button>
+                <br/>
+                <button
+                  onClick={handleSignout}
+                  className="bg-white text-lightText w-[30%] h-10 hover:bg-black hover:text-white duration-300 text-base tracking-wide"
+                >
+                  SignOut
+                </button>
               </div>
             )}
           </div>
+          <button style={{ padding: 10, margin: 10 }} onClick={connect}>
+        Connect
+      </button>
+      {connected && (
+        <div>
+          <>
+            {account && `Connected account: ${account}`}
+          </>
+        </div>
+      )}
         </div>
       </div>
     </div>

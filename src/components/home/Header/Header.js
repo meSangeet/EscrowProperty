@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useSDK } from '@metamask/sdk-react';
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { MdClose } from "react-icons/md";
 import { HiMenuAlt2 } from "react-icons/hi";
@@ -9,18 +8,6 @@ import Flex from "../../designLayouts/Flex";
 import './Header.css'
 
 const Header = () => {
-  const [account, setAccount] = useState();
-  const { sdk, connected, connecting } = useSDK();
-
-  const connect = async () => {
-    try {
-      const accounts = await sdk?.connect();
-      setAccount(accounts);
-    } catch(err) {
-      console.warn(`failed to connect..`, err);
-    }
-  };
-
   const [showMenu, setShowMenu] = useState(true);
   const [sidenav, setSidenav] = useState(false);
   const location = useLocation();
@@ -39,16 +26,7 @@ const Header = () => {
 
   return (
     <div className="w-full h-20 sticky top-0 z-50 border-b-[1px] border-b-gray-200 headercolor bg-opacity-25">
-      <button style={{ padding: 10, margin: 10 }} onClick={connect}>
-        Connect
-      </button>
-      {connected && (
-        <div>
-          <>
-            {account && `Connected account: ${account}`}
-          </>
-        </div>
-      )}
+
       <nav className="h-full px-4 max-w-container mx-auto relative">
         <Flex className="flex items-center justify-between h-full">
           <Link to="/">

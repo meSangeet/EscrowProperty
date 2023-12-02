@@ -22,14 +22,15 @@ import YourProps from "./pages/YourProps/YourProps";
 import Offer from "./pages/Offer/Offer";
 import Payment from "./pages/payment/Payment";
 import ProductDetails from "./pages/ProductDetails/ProductDetails";
-import Buy from "./pages/Buy/Buy";
+import { useEffect } from "react";
+import { useCookies } from "react-cookie";
+
 
 const Layout = () => {
   return (
     <div>
       <Header />
       <HeaderBottom />
-      <SpecialCase />
       <ScrollRestoration />
       <Outlet />
       <Footer />
@@ -47,7 +48,6 @@ const router = createBrowserRouter(
       >
         {/* ==================== Header Navlink Start here =================== */}
         <Route index element={<Home />} />
-        <Route path="/buy" element={<Buy />} />
         <Route path="/MyProfile" element={<MyProfile />} /> {/* Use an absolute path */}
         <Route path="/about" element={<About />} />
         <Route path="/addProps" element={<addProps />} />
@@ -65,6 +65,49 @@ const router = createBrowserRouter(
   )
 );
 function App() {
+
+
+  const [cookies, setCookie] = useCookies(['latt', 'long']);
+  useEffect(() => {
+    // Check for geolocation support
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          console.log("Latitude:", latitude);
+          console.log("Longitude:", longitude);
+          setCookie('latt', latitude);
+          setCookie('long', longitude);
+          // Now you can use the latitude and longitude values as needed
+          // For example, you could make an API call with these coordinates
+        },
+        (error) => {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              console.error("User denied the request for Geolocation.");
+              break;
+            case error.POSITION_UNAVAILABLE:
+              console.error("Location information is unavailable.");
+              break;
+            case error.TIMEOUT:
+              console.error("The request to get user location timed out.");
+              break;
+            case error.UNKNOWN_ERROR:
+              console.error("An unknown error occurred.");
+              break;
+            default:
+              console.error("Error getting user location:", error);
+          }
+        }
+      );
+    } else {
+      console.error("Geolocation is not supported by your browser.");
+    }
+  }, []); 
+
+
   return (
     <div className="font-bodyFont">
       <RouterProvider router={router} />
